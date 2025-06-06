@@ -1,0 +1,20 @@
+{
+  "@context": "https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld",
+  "version": 1,
+  "id": "pepe",
+  "controller": "0xC4a5bfA8b0C3eC5Fbda80AA46e00212D55b8A7b8",
+  "timestamp": "2025-06-06T12:00:00Z",
+  "counter": 3,
+  "dids": {
+    "default": "did:ethr:0xabc123...",
+    "mail": "did:key:z6Mki...",
+    "github": "did:web:example.com"
+  },
+  "proof": {
+    "type": "EcdsaSecp256k1Signature2019",
+    "created": "2025-06-06T12:00:00Z",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "0xC4a5bfA8b0C3eC5Fbda80AA46e00212D55b8A7b8",
+    "jws": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
