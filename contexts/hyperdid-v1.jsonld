@@ -1,1 +1,20 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "id": "@id",
+    "type": "@type",
+    "version": "https://schema.org/version",
+    "controller": "https://schema.org/identifier",
+    "timestamp": "https://schema.org/dateModified",
+    "counter": "https://schema.org/position",
+    "dids": {
+      "@id": "https://example.org/vocab#dids",
+      "@type": "@json"
+    },
+    "proof": {
+      "@id": "https://w3id.org/security#proof",
+      "@type": "@json"
+    }
+  }
+}
 
