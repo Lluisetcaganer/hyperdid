@@ -45,3 +45,20 @@ Example:
     "jws": "..."
   }
 }
+
+## 🧪 Validation
+
+- **JSON Schema**: [hyperdiddoc-v1.json](https://lluisetcaganer.github.io/hyperdid/schemas/hyperdiddoc-v1.json)
+- **Context**: [hyperdid-v1.jsonld](https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld)
+
+## 📁 Structure
+
+- `schemas/`: JSON Schema definitions
+- `contexts/`: JSON-LD context
+- `examples/`: Sample valid documents
+
+## 💡 Notes
+
+- The `default` key in `dids` is **required** and defines the primary DID.
+- Future versions may expand the context or structure.
+
