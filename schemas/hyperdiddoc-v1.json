@@ -1,1 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://Lluisetcaganer.github.io/hyperdid/schemas/hyperdiddoc-v1.json",
+  "title": "HyperDIDDoc v1",
+  "type": "object",
+  "required": ["@context", "version", "id", "controller", "timestamp", "counter", "dids", "proof"],
+  "properties": {
+    "@context": {
+      "type": "string",
+      "const": "https://Lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "controller": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "counter": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dids": {
+      "type": "object",
+      "properties": {
+        "default": { "type": "string" }
+      },
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": { "type": "string" }
+      },
+      "required": ["default"],
+      "additionalProperties": false
+    },
+    "proof": {
+      "type": "object",
+      "required": ["type", "created", "proofPurpose", "verificationMethod", "jws"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "EcdsaSecp256k1Signature2019"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "proofPurpose": {
+          "type": "string",
+          "const": "assertionMethod"
+        },
+        "verificationMethod": {
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$"
+        },
+        "jws": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
 
