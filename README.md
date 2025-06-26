@@ -44,7 +44,7 @@ Each `did:hyper:<id>` must resolve to a valid **HyperDID Document** hosted at an
     "jws": "..."
   }
 }
-
+```
 ## 🔍 Key Fields
 
 | Field         | Type     | Description |
