@@ -45,7 +45,7 @@ Each `did:hyper:<id>` must resolve to a valid **HyperDID Document** hosted at an
   }
 }
 
-### 🔍 Key Fields
+## 🔍 Key Fields
 
 | Field         | Type     | Description |
 |---------------|----------|-------------|
@@ -88,8 +88,7 @@ hyperdid/
 
 To test the **HyperDID** project locally (Metamask + Vite required):
 
-### 1. Clone the repository
+## 1. Clone the repository
 
-```bash
 git clone https://github.com/Lluisetcaganer/hyperdid
 cd hyperdid
