@@ -1,31 +1,29 @@
-# HyperDID - Standard Document Structure
+# HyperDID — Decentralized Identifier Registry & Document Standard
 
-This repository defines the official structure and context for **HyperDID Documents**, used by the `did:hyper:` resolver.
+This repository defines the official structure and resolution logic for **`did:hyper:<id>`** identifiers, including:
+
+- 📄 The **HyperDID Document** structure and its JSON-LD context.
+- 📦 The smart contract (`HyperDIDRegistry.sol`) used to manage ID ownership and resolution.
+- 🧩 A TypeScript-based **library and resolver** to interact with the system (Node.js and browser compatible).
+- 🧪 A local development UI using **Vite** and **Metamask**.
+
+---
 
 ## 🔧 Purpose
 
-The goal is to establish a consistent format for HyperDID documents (HyperDIDDoc), enabling the resolver to:
+The **HyperDID** project introduces a simple, permissionless way to register and resolve human-readable DIDs using a single smart contract and a linked document format. It enables:
 
-- Validate document structure via JSON Schema.
-- Understand and extract a list of associated DIDs.
-- Ensure forward compatibility and reliable resolution logic.
+- ✅ Full user control of identity records (`did:hyper:<id>`)
+- 🔐 Secure EIP-712-based signature verification
+- 🧭 Resolution to other DID methods (`did:ethr`, `did:web`, etc.)
+- 🧱 An extendable DID-document format (`HyperDIDDoc`)
 
-## 📘 Structure
+---
 
-Every valid HyperDIDDoc **must include** the following fields:
+## 📘 HyperDID Document Specification
 
-| Field       | Type     | Description |
-|-------------|----------|-------------|
-| `@context`  | string   | Must be: `https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld` |
-| `version`   | integer  | Fixed to `1` for now |
-| `id`        | string   | Unique internal identifier (e.g., `"pepe"`) |
-| `controller`| string   | Ethereum address of the owner (e.g., `"0xabc123..."`) |
-| `timestamp` | string   | ISO timestamp of the last update |
-| `counter`   | integer  | Document version number (increases on each update) |
-| `dids`      | object   | Map of DID keys (e.g. `default`, `github`, etc) with at least one `default` entry |
-| `proof`     | object   | Signature proof using `EcdsaSecp256k1Signature2019` |
+Each `did:hyper:<id>` must resolve to a valid **HyperDID Document** hosted at an IPFS or HTTPS pointer. The document must follow this structure:
 
-Example:
 ```json
 {
   "@context": "https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld",
@@ -35,7 +33,8 @@ Example:
   "timestamp": "2025-06-06T12:00:00Z",
   "counter": 3,
   "dids": {
-    "default": "did:ethr:0xabc123..."
+    "default": "did:ethr:0xabc123...",
+    "github": "did:web:github.com/..."
   },
   "proof": {
     "type": "EcdsaSecp256k1Signature2019",
@@ -46,19 +45,51 @@ Example:
   }
 }
 
-## 🧪 Validation
+### 🔍 Key Fields
 
-- **JSON Schema**: [hyperdiddoc-v1.json](https://lluisetcaganer.github.io/hyperdid/schemas/hyperdiddoc-v1.json)
-- **Context**: [hyperdid-v1.jsonld](https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld)
+| Field         | Type     | Description |
+|---------------|----------|-------------|
+| `@context`    | string   | Must be: `https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld` |
+| `version`     | integer  | Must be `1` (current document version) |
+| `id`          | string   | Human-readable identifier (e.g., `marc`, `pepe`) |
+| `controller`  | string   | Ethereum address of the document's owner |
+| `timestamp`   | string   | ISO 8601 timestamp indicating when the document was last signed |
+| `counter`     | integer  | Incremented version number (for future validation) |
+| `dids`        | object   | Map of tags to DIDs (`default`, `sign`, etc.) |
+| `proof`       | object   | EIP-712 signature metadata and JWS string |
 
-## 📁 Structure
+---
 
-- `schemas/`: JSON Schema definitions
-- `contexts/`: JSON-LD context
-- `examples/`: Sample valid documents
+## 🧩 Validation Tools
 
-## 💡 Notes
+- **JSON Schema**: [`hyperdiddoc-v1.json`](https://lluisetcaganer.github.io/hyperdid/schemas/hyperdiddoc-v1.json)
+- **JSON-LD Context**: [`hyperdid-v1.jsonld`](https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld)
 
-- The `default` key in `dids` is **required** and defines the primary DID.
-- Future versions may expand the context or structure.
+---
 
+## 📁 Repository Structure
+
+```bash
+hyperdid/
+├── index.html             # Frontend entry point (browser)
+├── vite.config.ts         # Vite config
+├── abi.json               # Compiled smart contract ABI
+├── contracts/
+│   └── HyperDIDRegistry.sol  # Smart contract source
+└── src/
+    ├── index.ts           # CLI interface to test resolution
+    ├── resolver.ts        # Resolution logic for did:hyper and DID aliases
+    ├── signer.ts          # EIP-712 document signer
+    ├── transact.ts        # Contract registration/update/transfer helpers
+    └── types.ts           # TypeScript types and constants
+
+
+## 🧪 Local Testing & Development
+
+To test the **HyperDID** project locally (Metamask + Vite required):
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Lluisetcaganer/hyperdid
+cd hyperdid
