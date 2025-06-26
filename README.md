@@ -51,7 +51,7 @@ Each `did:hyper:<id>` must resolve to a valid **HyperDID Document** hosted at an
 |---------------|----------|-------------|
 | `@context`    | string   | Must be: `https://lluisetcaganer.github.io/hyperdid/contexts/hyperdid-v1.jsonld` |
 | `version`     | integer  | Must be `1` (current document version) |
-| `id`          | string   | Human-readable identifier (e.g., `marc`, `pepe`) |
+| `id`          | string   | Human-readable identifier (e.g., `alice`, `bob`) |
 | `controller`  | string   | Ethereum address of the document's owner |
 | `timestamp`   | string   | ISO 8601 timestamp indicating when the document was last signed |
 | `counter`     | integer  | Incremented version number (for future validation) |
