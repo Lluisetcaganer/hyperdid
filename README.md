@@ -45,7 +45,7 @@ Each `did:hyper:<id>` must resolve to a valid **HyperDID Document** hosted at an
   }
 }
 ```
-## 🔍 Key Fields
+### 🔍 Key Fields
 
 | Field         | Type     | Description |
 |---------------|----------|-------------|
@@ -88,7 +88,37 @@ hyperdid/
 
 To test the **HyperDID** project locally (Metamask + Vite required):
 
-## 1. Clone the repository
+### 1. Clone the repository
 
+```bash
 git clone https://github.com/Lluisetcaganer/hyperdid
 cd hyperdid
+```
+### 2. Install dependencies
+
+```bash
+npm install
+```
+### 3. Ensure package.json includes the following scripts
+
+```json
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+}
+```
+### 4. Install dependencies
+
+```bash
+npm run dev
+```
+### 5. Open your browser
+Visit: http://localhost:5173
+
+Make sure that:
+
+✅ Metamask is installed and connected
+
+🌐 You are on the Sepolia network
