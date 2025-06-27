@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Firmar y Resolver HyperDID</title>
+  <style>
+    /* estilos omitidos para brevedad... */
+  </style>
+
+  <script type="module">
+    import { BrowserProvider } from "https://esm.sh/ethers@6.10.0";
+    import { buildAndSignDocument, validateInputForSigning } from "./src/signer";
+    import { initDidResolver, resolveDid } from "./src/resolver";
+    import {
+      getRegistryContract,
+      registerID,
+      updateID,
+      transferID,
+      deleteID
+    } from "./src/transact";
+    import abi from "./abi.json" assert { type: "json" };
+
+    let signer;
+    let contract;
+    let didResolver;
+
+    async function init() {
+      const status = document.getElementById("status");
+
+      if (!window.ethereum) {
+        status.textContent = "❌ Metamask no detectado";
+        return;
+      }
+
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const provider = new BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        contract = await getRegistryContract(signer);
+        didResolver = await initDidResolver(provider, abi);
+        const address = await signer.getAddress();
+        status.textContent = `🟢 Metamask conectado: ${address}`;
+      } catch (err) {
+        console.error("[init] Error:", err);
+        status.textContent = "❌ Error conectando con Metamask";
+      }
+    }
+
+    async function handleSign() {
+      const fileInput = document.getElementById("jsonFile");
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async function () {
+        try {
+          const json = JSON.parse(reader.result);
+          validateInputForSigning(json);
+
+          const signedDoc = await buildAndSignDocument(
+            signer,
+            11155111,
+            json.id,
+            json.dids,
+            json.counter
+          );
+
+          document.getElementById("output").textContent = JSON.stringify(signedDoc, null, 2);
+        } catch (e) {
+          console.error("[handleSign] Error:", e);
+          document.getElementById("output").textContent = `❌ Error: ${e.message}`;
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    async function handleResolve() {
+      const inputField = document.getElementById("didInput");
+      const output = document.getElementById("resolverOutput");
+      const userInput = inputField.value.trim();
+
+      if (!userInput) {
+        output.textContent = "❌ Introduce un identificador o DID";
+        return;
+      }
+
+      try {
+        console.log("[handleResolve] Resolviendo input:", userInput);
+        const result = await resolveDid(userInput);
+        console.log("[handleResolve] Resultado:", result);
+
+        const formatted = JSON.stringify(result, null, 2);
+        output.textContent = formatted;
+      } catch (e) {
+        console.error("Error resolviendo DID:", e);
+        output.textContent = `❌ Error resolviendo DID: ${e.message}`;
+      }
+    }
+
+    async function txWrap(action, label) {
+      const output = document.getElementById("txOutput");
+      try {
+        await action();
+        output.textContent = `✅ ${label} exitoso`;
+      } catch (err) {
+        console.error(`[${label}] Error:`, err);
+        output.textContent = `❌ Error en ${label}: ${err.message}`;
+      }
+    }
+
+    async function handleRegister() {
+  const id = document.getElementById("txId").value.trim();
+  const pointer = document.getElementById("txPointer").value.trim();
+  if (!id || !pointer) {
+    document.getElementById("txOutput").textContent = "❌ ID y Pointer son requeridos para registrar.";
+    return;
+  }
+  await txWrap(() => registerID(contract, id, pointer), "Registro");
+}
+
+
+    async function handleUpdate() {
+      const id = document.getElementById("txId").value.trim();
+      const pointer = document.getElementById("txPointer").value.trim();
+      await txWrap(() => updateID(contract, id, pointer), "Actualización");
+    }
+
+    async function handleTransfer() {
+      const id = document.getElementById("txId").value.trim();
+      const newOwner = document.getElementById("txNewOwner").value.trim();
+      await txWrap(() => transferID(contract, id, newOwner), "Transferencia");
+    }
+
+    async function handleDelete() {
+      const id = document.getElementById("txId").value.trim();
+      await txWrap(() => deleteID(contract, id), "Eliminación");
+    }
+
+    window.onload = init;
+    window.handleSign = handleSign;
+    window.handleResolve = handleResolve;
+    window.handleRegister = handleRegister;
+    window.handleUpdate = handleUpdate;
+    window.handleTransfer = handleTransfer;
+    window.handleDelete = handleDelete;
+  </script>
+</head>
+<body>
+  <h1>Gestión de HyperDID</h1>
+  <p id="status">🟡 Esperando conexión con Metamask...</p>
+
+  <div style="display: flex; gap: 40px; align-items: flex-start; justify-content: space-between;">
+    <!-- Columna izquierda -->
+    <div style="flex: 1;">
+      <h2>Firmar documento</h2>
+      <input type="file" id="jsonFile" accept=".json" />
+      <button onclick="handleSign()">Firmar</button>
+      <pre id="output"></pre>
+
+      <hr />
+
+      <h2>Registrar nuevo DID</h2>
+      <label>ID: <input type="text" id="txId" placeholder="bob, alice, etc" /></label><br />
+      <label>Pointer URL: <input type="text" id="txPointer" placeholder="https://ejemplo.com/doc.json" /></label><br />
+      <button onclick="handleRegister()">Registrar</button>
+    </div>
+
+    <!-- Columna derecha -->
+    <div style="flex: 1;">
+      <h2>Resolver DID</h2>
+      <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+        <span style="font-family: monospace; color: #555;">did:hyper:</span>
+        <input type="text" id="didInput" placeholder="bob, alice o did:ethr:..." />
+        <button onclick="handleResolve()">Buscar</button>
+      </div>
+      <pre id="resolverOutput"></pre>
+
+      <hr />
+
+      <h2>Modificar DID existente</h2>
+      <label>ID: <input type="text" id="txId" placeholder="ID a modificar" /></label><br />
+      <label>Nuevo Pointer URL: <input type="text" id="txPointer" placeholder="Nuevo pointer opcional" /></label><br />
+      <label>Nuevo Owner: <input type="text" id="txNewOwner" placeholder="0x123... (solo para transferir)" /></label><br />
+
+      <button onclick="handleUpdate()">Actualizar</button>
+      <button onclick="handleTransfer()">Transferir</button>
+      <button onclick="handleDelete()">Eliminar</button>
+    </div>
+  </div>
+
+  <pre id="txOutput"></pre>
+</body>
+
+
+</html>
